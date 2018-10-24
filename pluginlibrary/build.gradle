@@ -24,6 +24,27 @@ android {
 
 }
 
+//删除之前打出的包，默认将包打在'build/libs/'下
+task deleteOldJar(type: Delete){
+    delete 'build/libs/pluginlibrary.jar'
+}
+//打包操作
+task makeJar(type: org.gradle.api.tasks.bundling.Jar){
+    //要打成的包的名字
+    baseName 'pluginlibrary'
+    //选取要打包的文件夹
+    from('build/intermediates/classes/debug/com/lsw/pluginlibrary')
+    //需要跟实际类的包名路径一样
+    into('com/lsw/pluginlibrary')
+    //排除在外的文件
+    exclude('BuildConfig.class', 'R.class')
+    //排除以R$开头的文件
+    exclude{ it.name.startsWith('R$');}
+}
+//打包
+makeJar.dependsOn(deleteOldJar, build)
+
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
