@@ -38,4 +38,10 @@
         android:id="@+id/btn_4"
         android:text="获取插件中的字符串"/>
 
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_5"
+        android:text="测试换肤功能"/>
+
 </LinearLayout>

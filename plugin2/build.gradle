@@ -6,7 +6,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.lsw.plugin1"
+        applicationId "com.lsw.plugin2"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
@@ -26,14 +26,13 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-//    implementation project(':pluginlibrary')
-    compileOnly files('libs/pluginlibrary.jar')
 }
 
 assemble.doLast {
@@ -46,7 +45,7 @@ assemble.doLast {
                 copy {
                     from originFile
                     into "$rootDir/app/src/main/assets"
-                    rename(originFile.name, "plugin1.apk")
+                    rename(originFile.name, "plugin2.apk")
                 }
             }
         }

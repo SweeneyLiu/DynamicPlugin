@@ -2,6 +2,7 @@ package com.lsw.dynamicplugin;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ public class MainActivity extends BaseActivity {
         Button btn_2 = (Button) findViewById(R.id.btn_2);
         Button btn_3 = (Button) findViewById(R.id.btn_3);
         Button btn_4 = (Button) findViewById(R.id.btn_4);
+        Button btn_5 = (Button) findViewById(R.id.btn_5);
         tv = (TextView) findViewById(R.id.tv);
 
         //普通调用，反射的方式
@@ -105,7 +107,7 @@ public class MainActivity extends BaseActivity {
         btn_4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                loadResources();
+                loadResources(plugins.get(pluginName).getDexPath());
                 Class mLoadClassDynamic = null;
 
                 try {
@@ -119,6 +121,15 @@ public class MainActivity extends BaseActivity {
                 } catch (Exception e) {
                     Log.e("DEMO", "msg:" + e.getMessage());
                 }
+            }
+        });
+
+        btn_5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this,ResourceActivity.class);
+                startActivity(intent);
             }
         });
 
