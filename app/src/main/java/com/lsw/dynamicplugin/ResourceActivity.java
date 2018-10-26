@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,7 +37,8 @@ public class ResourceActivity extends BaseActivity {
 
                 loadResources(pluginInfo.getDexPath());
 
-                doSomething(pluginInfo.getClassLoader(),"com.lsw.plugin1.UIUtil");
+//                doSomething(pluginInfo.getClassLoader(), "com.lsw.plugin1.UIUtil");
+                doSomething2(pluginInfo.getClassLoader(), "com.lsw.plugin1");
             }
         });
 
@@ -47,12 +49,13 @@ public class ResourceActivity extends BaseActivity {
 
                 loadResources(pluginInfo.getDexPath());
 
-                doSomething(pluginInfo.getClassLoader(),"com.lsw.plugin2.UIUtil");
+//                doSomething(pluginInfo.getClassLoader(), "com.lsw.plugin2.UIUtil");
+                doSomething2(pluginInfo.getClassLoader(), "com.lsw.plugin2");
             }
         });
     }
 
-    private void doSomething(ClassLoader cl,String className) {
+    private void doSomething(ClassLoader cl, String className) {
         try {
             Class clazz = cl.loadClass(className);
             Class[] classes = new Class[]{Context.class};
@@ -72,4 +75,28 @@ public class ResourceActivity extends BaseActivity {
             Log.e("DEMO", "msg:" + e.getMessage());
         }
     }
+
+    //另一种换肤方式
+    private void doSomething2(ClassLoader cl, String packageName) {
+        try {
+            Class stringClass = cl.loadClass(packageName + ".R$string");
+            int resId1 = (int) RefInvoke.getFieldObject(stringClass, null, "hello_message");
+            textV.setText(getResources().getString(resId1));
+
+
+            Class drawableClass = cl.loadClass(packageName + ".R$drawable");
+            int resId2 = (int) RefInvoke.getFieldObject(drawableClass, null, "robert");
+            imgV.setBackgroundDrawable(getResources().getDrawable(resId2));
+
+            Class layoutClazz = cl.loadClass(packageName + ".R$layout");
+            int resId3 = (int) RefInvoke.getFieldObject(layoutClazz, null, "main_activity");
+            View view = (View) LayoutInflater.from(this).inflate(resId3, null);
+            layout.removeAllViews();
+            layout.addView(view);
+
+        } catch (Exception e) {
+            Log.e("DEMO", "msg:" + e.getMessage());
+        }
+    }
+
 }
