@@ -21,56 +21,15 @@ import java.lang.reflect.Method;
 
 import dalvik.system.DexClassLoader;
 
-public class MainActivity extends AppCompatActivity {
-
-    private AssetManager mAssetManager;
-    private Resources mResources;
-    private Resources.Theme mTheme;
-    private String dexpath = null;    //apk文件地址
-    private File fileRelease = null;  //释放目录
-    private DexClassLoader classLoader = null;
-
-    private String apkName = "plugin1-debug.apk";    //apk名称
+public class MainActivity extends BaseActivity {
 
     TextView tv;
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(newBase);
-        try {
-            Utils.extractAssets(newBase, apkName);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
 
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        File extractFile = this.getFileStreamPath(apkName);
-        dexpath = extractFile.getPath();
-
-        /*
-         * 1.创建并返回一个指定名称的目录，在这个目录下来存些东西 输出结果为：
-         *   getDir():/data/data/com.lsw.dynamic/app_dex
-         *   参数int mode是指文件夹的访问权限而并不包括其子文件夹和文件的访问权限
-         */
-        fileRelease = getDir("dex", 0); //0 表示Context.MODE_PRIVATE
-
-        Log.d("DEMO", "dexpath:" + dexpath);
-        Log.d("DEMO", "fileRelease.getAbsolutePath():" +
-                fileRelease.getAbsolutePath());
-
-        //dexPath:被解压的apk路径，不能为空。
-        //optimizedDirectory：解压后的.dex文件的存储路径，不能为空。这个路径强烈建议使用应用程序的私有路径，不要放到sdcard上，否则代码容易被注入攻击。
-        //libraryPath：os库的存放路径，可以为空，若有os库，必须填写。
-        //parent：父亲加载器，一般为context.getClassLoader(),使用当前上下文的类加载器。
-
-        classLoader = new DexClassLoader(dexpath,
-                fileRelease.getAbsolutePath(), null, getClassLoader());
 
         Button btn_1 = (Button) findViewById(R.id.btn_1);
         Button btn_2 = (Button) findViewById(R.id.btn_2);
@@ -164,54 +123,5 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
-    protected void loadResources() {
-        try {
-            AssetManager assetManager = AssetManager.class.newInstance();
-            Method addAssetPath = assetManager.getClass().getMethod("addAssetPath", String.class);
-            addAssetPath.invoke(assetManager, dexpath);
-            mAssetManager = assetManager;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mResources = new Resources(mAssetManager, super.getResources().getDisplayMetrics(), super.getResources().getConfiguration());
-        mTheme = mResources.newTheme();
-        mTheme.setTo(super.getTheme());
-    }
-
-    @Override
-    public AssetManager getAssets() {
-        if(mAssetManager == null) {
-            Log.e("DEMO3", "mAssetManager is null");
-            return super.getAssets();
-        }
-
-        Log.e("DEMO3", "mAssetManager is not null");
-        return mAssetManager;
-    }
-
-    @Override
-    public Resources getResources() {
-        if(mResources == null) {
-            Log.e("DEMO3", "mResources is null");
-            return super.getResources();
-        }
-
-        Log.e("DEMO3", "mResources is not null");
-        return mResources;
-    }
-
-    @Override
-    public Resources.Theme getTheme() {
-        if(mTheme == null) {
-            Log.e("DEMO3", "Theme is null");
-            return super.getTheme();
-        }
-
-        Log.e("DEMO3", "Theme is not null");
-        return mTheme;
-    }
-
 
 }
