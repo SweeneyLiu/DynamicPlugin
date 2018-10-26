@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.lsw.pluginlibrary.IBean;
 import com.lsw.pluginlibrary.ICallback;
+import com.lsw.pluginlibrary.IDynamic;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         Button btn_1 = (Button) findViewById(R.id.btn_1);
         Button btn_2 = (Button) findViewById(R.id.btn_2);
         Button btn_3 = (Button) findViewById(R.id.btn_3);
-
+        Button btn_4 = (Button) findViewById(R.id.btn_4);
         tv = (TextView) findViewById(R.id.tv);
 
         //普通调用，反射的方式
@@ -141,5 +142,76 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //带资源文件的调用
+        btn_4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                loadResources();
+                Class mLoadClassDynamic = null;
+
+                try {
+                    mLoadClassDynamic = classLoader.loadClass("com.lsw.plugin1.Dynamic");
+                    Object dynamicObject = mLoadClassDynamic.newInstance();
+
+                    IDynamic dynamic = (IDynamic) dynamicObject;
+                    String content = dynamic.getStringForResId(MainActivity.this);
+                    tv.setText(content);
+                    Toast.makeText(getApplicationContext(), content + "", Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Log.e("DEMO", "msg:" + e.getMessage());
+                }
+            }
+        });
+
     }
+
+    protected void loadResources() {
+        try {
+            AssetManager assetManager = AssetManager.class.newInstance();
+            Method addAssetPath = assetManager.getClass().getMethod("addAssetPath", String.class);
+            addAssetPath.invoke(assetManager, dexpath);
+            mAssetManager = assetManager;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mResources = new Resources(mAssetManager, super.getResources().getDisplayMetrics(), super.getResources().getConfiguration());
+        mTheme = mResources.newTheme();
+        mTheme.setTo(super.getTheme());
+    }
+
+    @Override
+    public AssetManager getAssets() {
+        if(mAssetManager == null) {
+            Log.e("DEMO3", "mAssetManager is null");
+            return super.getAssets();
+        }
+
+        Log.e("DEMO3", "mAssetManager is not null");
+        return mAssetManager;
+    }
+
+    @Override
+    public Resources getResources() {
+        if(mResources == null) {
+            Log.e("DEMO3", "mResources is null");
+            return super.getResources();
+        }
+
+        Log.e("DEMO3", "mResources is not null");
+        return mResources;
+    }
+
+    @Override
+    public Resources.Theme getTheme() {
+        if(mTheme == null) {
+            Log.e("DEMO3", "Theme is null");
+            return super.getTheme();
+        }
+
+        Log.e("DEMO3", "Theme is not null");
+        return mTheme;
+    }
+
+
 }
