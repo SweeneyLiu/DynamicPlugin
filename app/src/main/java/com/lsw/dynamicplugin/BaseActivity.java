@@ -54,18 +54,26 @@ public class BaseActivity extends AppCompatActivity {
         genegatePluginInfo(plugin2);
     }
 
+    /**
+     * @param pluginName
+     */
     protected void genegatePluginInfo(String pluginName) {
         File extractFile = this.getFileStreamPath(pluginName);
         /*
          * 1.创建并返回一个指定名称的目录，在这个目录下来存些东西 输出结果为：
          *   getDir():/data/data/com.lsw.dynamic/app_dex
          *   参数int mode是指文件夹的访问权限而并不包括其子文件夹和文件的访问权限
+         *   创建文件的权限:MODE_PRIVATE：说明该文件只能被当前的应用程序所读写
+         *   MODE_APPEND：以追加方式打开该文件，应用程序可以向该文件中追加内容。
+         *   MODE_WORLD_READABLE：该文件的内容可以被其他的应用程序所读取
+         *   MODE_WORLD_WRITEABLE：该文件的内容可以被其他的应用程序所读、写
+         *
          */
-        File fileRelease = getDir("dex", 0);
+        File fileRelease = getDir("dex", Context.MODE_PRIVATE);
         String dexpath = extractFile.getPath();
         //dexPath:被解压的apk路径，不能为空。
         //optimizedDirectory：解压后的.dex文件的存储路径，不能为空。这个路径强烈建议使用应用程序的私有路径，不要放到sdcard上，否则代码容易被注入攻击。
-        //libraryPath：os库的存放路径，可以为空，若有os库，必须填写。
+        //libraryPath：so库的存放路径，可以为空，若有so库，必须填写。
         //parent：父亲加载器，一般为context.getClassLoader(),使用当前上下文的类加载器。
         DexClassLoader classLoader = new DexClassLoader(dexpath, fileRelease.getAbsolutePath(), null, getClassLoader());
 
@@ -74,8 +82,11 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void loadResources(String dexPath) {
         try {
+            //创建AssetManager对象
             AssetManager assetManager = AssetManager.class.newInstance();
+            //在assetManager对象中获得addAssetPath方法
             Method addAssetPath = assetManager.getClass().getMethod("addAssetPath", String.class);
+            //执行addAssetPath方法
             addAssetPath.invoke(assetManager, dexPath);
             mAssetManager = assetManager;
         } catch (Exception e) {
